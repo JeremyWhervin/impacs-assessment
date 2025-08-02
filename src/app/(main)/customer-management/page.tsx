@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { columns, type CustomersTable } from './columns'
 import { DataTable } from './data-table'
+import { CreateCustomerButton } from './_components/CreateCustomer'
 
 async function getData(): Promise<CustomersTable[]> {
 
@@ -56,7 +57,10 @@ export default async function CustomerManager() {
   return (
     <div className="w-full">
       <div className='px-4 pt-2'>
-        <h3 className='font-medium'>Customer Management</h3>
+        <div className="flex items-center justify-between">
+          <h3 className='font-medium'>Customer Management</h3>
+          <CreateCustomerButton />
+        </div>
       </div>
       <div className='p-4'>
         <DataTable columns={columns} data={data} />

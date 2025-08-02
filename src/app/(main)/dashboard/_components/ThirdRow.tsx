@@ -2,7 +2,7 @@ import React from 'react'
 import { GlobalPie } from '@/components/line-chart'
 
 interface ThirdRowProps {
-  customerLocationData: { location: string; customers: number; fill: string }[]
+  customerLocationData: { location: string; customers: number }[]
 }
 
 const ThirdRow = ({ customerLocationData }: ThirdRowProps) => {

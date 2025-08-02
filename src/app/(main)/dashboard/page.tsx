@@ -213,25 +213,10 @@ async function getCustomerLocationData() {
     }
   })
 
-  // Convert to array format expected by pie chart
-  const colors = [
-    "#8884d8", // purple
-    "#82ca9d", // green
-    "#ffc658", // yellow
-    "#ff7300", // orange
-    "#ff0000", // red
-    "#00ff00", // lime
-    "#0000ff", // blue
-    "#ff00ff", // magenta
-    "#00ffff", // cyan
-    "#800080"  // purple
-  ]
-
   const transformedData = Object.entries(locationCounts)
     .map(([location, count], index) => ({
       location,
       customers: count,
-      fill: colors[index % colors.length]
     }))
     .sort((a, b) => b.customers - a.customers) // Sort by count descending
 

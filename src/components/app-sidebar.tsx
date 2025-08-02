@@ -12,7 +12,7 @@ import {
   SidebarGroupLabel,
   SidebarGroupContent
 } from "@/components/ui/sidebar"
-import { Home, Inbox } from "lucide-react"
+import { Home, Inbox, Shapes } from "lucide-react"
 import { usePathname } from "next/navigation"
 
 const items = [
@@ -34,7 +34,12 @@ export function AppSidebar() {
 
   return (
     <Sidebar>
-      <SidebarHeader><p className="font-medium">Big Toy Maker</p></SidebarHeader>
+      <SidebarHeader>
+        <div className='flex gap-1'>
+          <Shapes />
+           <p className="font-medium">Big Toy Maker</p>
+        </div>
+      </SidebarHeader>
       <SidebarContent>
          <SidebarGroup>
           <SidebarGroupLabel>Navigation</SidebarGroupLabel>

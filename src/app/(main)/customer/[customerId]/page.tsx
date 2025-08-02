@@ -1,5 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
 import { notFound } from 'next/navigation'
+import { ExportPDFButton } from '../_components/ExportBTn'
 import {
   Card,
   CardContent,
@@ -84,10 +85,11 @@ export default async function CustomerDetailPage({ params }: CustomerDetailPageP
 
   return (
     <div className="w-full">
-      <div className='px-4 pt-2'>
+      <div className='px-4 pt-2 flex items-center justify-between'>
         <h3 className='font-medium'>Customer Details</h3>
+        <ExportPDFButton customerName={customer.name} />
       </div>
-      <div className='p-4 space-y-3'>
+      <div className='p-4 space-y-3 whereToGet'>
         
         {/* Customer Information Card */}
         <Card>
