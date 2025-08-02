@@ -13,34 +13,28 @@ export async function login(formData: FormData) {
   const data = {
     email: formData.get('email') as string,
     password: formData.get('password') as string,
+
   }
+
+  console.log('[LOGIN ATTEMPT]', data)
 
   const { error } = await supabase.auth.signInWithPassword(data)
 
   if (error) {
+    console.error('[LOGIN ERROR]', error)
     redirect('/error')
   }
 
-  revalidatePath('/', 'layout')
-  redirect('/')
+  console.log('[LOGIN SUCCESSFUL]')
+  revalidatePath('/dashboard', 'layout')
+  redirect('/dashboard')
 }
 
-export async function signup(formData: FormData) {
-  const supabase = await createClient()
 
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
-  const data = {
-    email: formData.get('email') as string,
-    password: formData.get('password') as string,
-  }
+export async function logout() {
+ const supabase = await createClient()
 
-  const { error } = await supabase.auth.signUp(data)
+  await supabase.auth.signOut()
 
-  if (error) {
-    redirect('/error')
-  }
-
-  revalidatePath('/', 'layout')
-  redirect('/')
+  redirect('/login')
 }

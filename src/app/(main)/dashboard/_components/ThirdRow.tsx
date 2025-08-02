@@ -1,10 +1,14 @@
 import React from 'react'
-import { DashLineChart } from '@/components/line-chart'
+import { GlobalPie } from '@/components/line-chart'
 
-const ThirdRow = () => {
+interface ThirdRowProps {
+  customerLocationData: { location: string; customers: number; fill: string }[]
+}
+
+const ThirdRow = ({ customerLocationData }: ThirdRowProps) => {
   return (
     <div>
-        <DashLineChart />
+        <GlobalPie chartData={customerLocationData} />
     </div>
   )
 }

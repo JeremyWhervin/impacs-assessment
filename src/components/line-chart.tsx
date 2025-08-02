@@ -1,88 +1,79 @@
 "use client"
 
-import { TrendingUp } from "lucide-react"
-import { CartesianGrid, Line, LineChart, XAxis } from "recharts"
+import { Pie, PieChart } from "recharts"
 
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
 import {
   ChartConfig,
   ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
 } from "@/components/ui/chart"
 
-export const description = "A line chart"
+export const description = "A pie chart with a legend"
 
-const chartData = [
-  { month: "January", desktop: 186 },
-  { month: "February", desktop: 305 },
-  { month: "March", desktop: 237 },
-  { month: "April", desktop: 73 },
-  { month: "May", desktop: 209 },
-  { month: "June", desktop: 214 },
+const defaultChartData = [
+  { location: "City", customers: 275, fill: "#8884d8" },
+  { location: "Town", customers: 200, fill: "#82ca9d" },
+  { location: "Village", customers: 187, fill: "#ffc658" },
+  { location: "District", customers: 173, fill: "#ff7300" },
+  { location: "Other", customers: 90, fill: "#ff0000" },
 ]
 
 const chartConfig = {
-  desktop: {
-    label: "Desktop",
-    color: "var(--chart-1)",
+  customers: {
+    label: "Customers",
   },
 } satisfies ChartConfig
 
-export function DashLineChart() {
+interface GlobalPieProps {
+  chartData?: { location: string; customers: number; fill: string }[]
+}
+
+export function GlobalPie({ chartData = defaultChartData }: GlobalPieProps) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Orders over the past 6 months</CardTitle>
-        <CardDescription>January - June 2025</CardDescription>
+    <Card className="flex flex-col">
+      <CardHeader className="items-center pb-0">
+        <CardTitle>Customer Location Distribution</CardTitle>
+        <CardDescription>Based on delivery addresses</CardDescription>
       </CardHeader>
-      <CardContent>
-        <ChartContainer config={chartConfig}>
-          <LineChart
-            accessibilityLayer
-            data={chartData}
-            margin={{
-              left: 12,
-              right: 12,
-            }}
-          >
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="month"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              tickFormatter={(value) => value.slice(0, 3)}
+      <CardContent className="flex-1 pb-0">
+        <ChartContainer
+          config={chartConfig}
+          className="mx-auto aspect-square max-h-[300px]"
+        >
+          <PieChart>
+            <Pie 
+              data={chartData} 
+              dataKey="customers" 
+              nameKey="location"
+              cx="50%"
+              cy="50%"
+              outerRadius={80}
+              fill="#8884d8"
             />
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent hideLabel />}
-            />
-            <Line
-              dataKey="desktop"
-              type="natural"
-              stroke="var(--color-desktop)"
-              strokeWidth={2}
-              dot={false}
-            />
-          </LineChart>
+          </PieChart>
         </ChartContainer>
+        
+        {/* Custom Legend */}
+        <div className="mt-4 flex flex-wrap justify-center gap-4">
+          {chartData.map((item, index) => (
+            <div key={index} className="flex items-center gap-2">
+              <div 
+                className="h-4 w-4 rounded-full" 
+                style={{ backgroundColor: item.fill }}
+              />
+              <span className="text-sm font-medium">
+                {item.location} ({item.customers})
+              </span>
+            </div>
+          ))}
+        </div>
       </CardContent>
-      <CardFooter className="flex-col items-start gap-2 text-sm">
-        <div className="flex gap-2 leading-none font-medium">
-          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-        </div>
-        <div className="text-muted-foreground leading-none">
-          Showing total visitors for the last 6 months
-        </div>
-      </CardFooter>
     </Card>
   )
 }

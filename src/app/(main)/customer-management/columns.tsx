@@ -2,7 +2,8 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { MoreHorizontal } from "lucide-react"
-
+import Link from "next/link"
+ 
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -13,25 +14,42 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
+
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
-export type Payment = {
-  id: string
-  amount: number
-  status: "pending" | "processing" | "success" | "failed"
+export type CustomersTable = {
+  customerName: string
   email: string
+  recentOrderDate: string
+  deliveryDate: string
+  customerId: string
 }
 
-export const columns: ColumnDef<Payment>[] = [
-    
+export const columns: ColumnDef<CustomersTable>[] = [
   {
-     id: "actions",
+    accessorKey: "customerName",
+    header: "Name",
+  },
+  {
+    accessorKey: "email",
+    header: "Email"
+  },
+  {
+    accessorKey: "recentOrderDate",
+    header: "Recent Order"
+  },
+  {
+    accessorKey: "deliveryDate",
+    header: "Delivery date"
+  },
+  {
+    id: "actions",
     cell: ({ row }) => {
-      const payment = row.original
+      const customer = row.original
  
       return (
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+          <DropdownMenuTrigger asChild className="flex justify-self-end">
             <Button variant="ghost" className="h-8 w-8 p-0">
               <span className="sr-only">Open menu</span>
               <MoreHorizontal className="h-4 w-4" />
@@ -40,13 +58,18 @@ export const columns: ColumnDef<Payment>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment.id)}
-            >
-              Copy payment ID
+              onClick={() => navigator.clipboard.writeText(customer.customerName)}>
+              Copy customer name
             </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link href={`/customer/${customer.customerId}`}>
+                View customer details
+              </Link>
+              
+            </DropdownMenuItem> 
+            <DropdownMenuItem>Edit order details</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
+            <DropdownMenuItem>Delete customer</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       )

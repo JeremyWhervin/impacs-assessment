@@ -1,5 +1,5 @@
 "use client"
-
+import LogoutButton  from './logout-button'
 import {
   Sidebar,
   SidebarMenu,
@@ -13,6 +13,7 @@ import {
   SidebarGroupContent
 } from "@/components/ui/sidebar"
 import { Home, Inbox } from "lucide-react"
+import { usePathname } from "next/navigation"
 
 const items = [
   {
@@ -28,6 +29,9 @@ const items = [
 ]
 
 export function AppSidebar() {
+
+  const pathname = usePathname()
+
   return (
     <Sidebar>
       <SidebarHeader><p className="font-medium">Big Toy Maker</p></SidebarHeader>
@@ -38,11 +42,18 @@ export function AppSidebar() {
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton asChild
+                    isActive={item.url ? pathname === item.url : false}
+                    className={
+                    pathname === item.url
+                      ? "" 
+                      : "text-muted-foreground"
+                      }>
                     <a href={item.url}>
                       <item.icon />
                       <span>{item.title}</span>
                     </a>
+
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -55,9 +66,7 @@ export function AppSidebar() {
 
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild>
-                    <a href="#">
-                      <span>Log out</span>
-                    </a>
+                    <LogoutButton />
                   </SidebarMenuButton>
                 </SidebarMenuItem>
 
