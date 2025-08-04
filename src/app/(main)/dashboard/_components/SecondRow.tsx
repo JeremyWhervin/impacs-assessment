@@ -18,7 +18,7 @@ const SecondRow = ({ toyPopularityData, weeklyOrdersData }: SecondRowProps) => {
       </div>
 
       <div className='flex-1'>
-            <PopularityChart chartData={toyPopularityData} />
+          <PopularityChart chartData={toyPopularityData} />
       </div>
     </div>
   )

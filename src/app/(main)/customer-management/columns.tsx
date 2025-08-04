@@ -5,7 +5,6 @@ import { ColumnDef } from "@tanstack/react-table"
 import { MoreHorizontal, Edit, Trash2, Check, X } from "lucide-react"
 import Link from "next/link"
 import { createClient } from '@/utils/supabase/client'
- 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -27,8 +26,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-// This type is used to define the shape of our data.
-// You can use a Zod schema here if you want.
+
+
+
 export type CustomersTable = {
   customerName: string
   email: string
@@ -75,8 +75,8 @@ function EditCustomerDialog({ customer }: EditCustomerDialogProps) {
 
       alert('Customer updated successfully!')
       setOpen(false)
-      // Refresh the page to show updated data
-      window.location.reload()
+      
+
     } catch (error) {
       console.error('Error:', error)
       alert('Failed to update customer')
@@ -186,7 +186,7 @@ export const columns: ColumnDef<CustomersTable>[] = [
           }
 
           setIsEditing(false)
-          // Update the row data
+          
           row.original.customerName = value
         } catch (error) {
           console.error('Error:', error)
@@ -259,7 +259,7 @@ export const columns: ColumnDef<CustomersTable>[] = [
           }
 
           setIsEditing(false)
-          // Update the row data
+          
           row.original.email = value
         } catch (error) {
           console.error('Error:', error)
@@ -328,7 +328,7 @@ export const columns: ColumnDef<CustomersTable>[] = [
         try {
           const supabase = createClient()
           
-          // First, get all order IDs for this customer
+          
           const { data: orders } = await supabase
             .from('orders')
             .select('id')
@@ -337,7 +337,7 @@ export const columns: ColumnDef<CustomersTable>[] = [
           if (orders && orders.length > 0) {
             const orderIds = orders.map(order => order.id)
             
-            // Delete ordered_toys for these orders
+            
             const { error: toyError } = await supabase
               .from('ordered_toys')
               .delete()
@@ -347,7 +347,7 @@ export const columns: ColumnDef<CustomersTable>[] = [
               console.error('Error deleting ordered toys:', toyError)
             }
 
-            // Delete orders
+            
             const { error: orderError } = await supabase
               .from('orders')
               .delete()
@@ -358,23 +358,23 @@ export const columns: ColumnDef<CustomersTable>[] = [
             }
           }
 
-          // Delete customer
+          
           const { error: customerError } = await supabase
             .from('customers')
             .delete()
             .eq('id', customer.customerId)
 
           if (customerError) {
-            console.error('Error deleting customer:', customerError)
+            // console.error('Error deleting customer', customerError)
             alert('Failed to delete customer')
+            // add sonner when ur done
             return
           }
 
           alert('Customer deleted successfully!')
-          // Refresh the page to update the table
           window.location.reload()
         } catch (error) {
-          console.error('Error:', error)
+          // console.error('Error', error)
           alert('Failed to delete customer')
         }
       }
@@ -402,7 +402,7 @@ export const columns: ColumnDef<CustomersTable>[] = [
               onClick={handleDelete}
               className="text-red-600 focus:text-red-600"
             >
-              <Trash2 className="mr-2 h-4 w-4" />
+              <Trash2 className="mr-2 h-4 w-4 text-red-600" />
               Delete customer
             </DropdownMenuItem>
           </DropdownMenuContent>

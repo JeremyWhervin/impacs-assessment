@@ -1,6 +1,5 @@
 import React from 'react'
 import { createClient } from '@/utils/supabase/server'
-import { Separator } from "@/components/ui/separator"
 import KPIrow from './_components/KPIrow'
 import SecondRow from './_components/SecondRow'
 import ThirdRow from './_components/ThirdRow'
@@ -13,7 +12,7 @@ async function getOrderCount() {
     .select('*', { count: 'exact', head: true })
 
   if (error) {
-    console.error('Error fetching order count:', error)
+    console.error(error)
     return 0
   }
 
@@ -28,7 +27,7 @@ async function getCustomerCount() {
     .select('*', { count: 'exact', head: true })
 
   if (error) {
-    console.error('Error fetching customer count:', error)
+    console.error('customer count error', error)
     return 0
   }
 
@@ -44,7 +43,7 @@ async function getOrdersInTransitCount() {
     .is('delivery_date', null)
 
   if (error) {
-    console.error('Error fetching orders in transit count:', error)
+    console.error('null orders error', error)
     return 0
   }
 
@@ -54,37 +53,34 @@ async function getOrdersInTransitCount() {
 async function getToyPopularityData() {
   const supabase = await createClient()
   
-  console.log('Fetching toy popularity data...')
+
   
-  // First, let's test if the ordered_toys table exists and get its structure
+
   const { data: orderedToysData, error: orderedToysError } = await supabase
     .from('ordered_toys')
     .select('*')
     .limit(5)
 
   if (orderedToysError) {
-    console.error('Error fetching ordered_toys table:', orderedToysError)
-    console.error('Error details:', orderedToysError.message, orderedToysError.details, orderedToysError.hint)
+    console.error('ordered toys error', orderedToysError.message, orderedToysError.details, orderedToysError.hint)
     return []
   }
 
-  console.log('ordered_toys table structure:', orderedToysData)
+  console.log(orderedToysData)
 
-  // Now let's test the toys table
   const { data: toysData, error: toysError } = await supabase
     .from('toys')
     .select('*')
     .limit(5)
 
   if (toysError) {
-    console.error('Error fetching toys table:', toysError)
-    console.error('Error details:', toysError.message, toysError.details, toysError.hint)
+    console.error('toy error', toysError.message, toysError.details, toysError.hint)
     return []
   }
 
-  console.log('toys table structure:', toysData)
+  console.log(toysData)
 
-  // Get all ordered_toys data with toy information
+
   const { data, error } = await supabase
     .from('ordered_toys')
     .select(`
@@ -95,14 +91,13 @@ async function getToyPopularityData() {
     `)
 
   if (error) {
-    console.error('Error fetching toy popularity data with join:', error)
     console.error('Error details:', error.message, error.details, error.hint)
     return []
   }
 
-  console.log('Raw data from Supabase with join:', data)
+  // console.log(data)
 
-  // Count orders for each toy
+
   const toyCounts: { [key: string]: number } = {}
   
   data?.forEach(item => {
@@ -122,20 +117,19 @@ async function getToyPopularityData() {
 async function getWeeklyOrdersData() {
   const supabase = await createClient()
   
-  console.log('Fetching weekly orders data...')
   
-  // Get the last 7 days
+
   const today = new Date()
   const sevenDaysAgo = new Date(today)
-  sevenDaysAgo.setDate(today.getDate() - 6) // 7 days including today
+  sevenDaysAgo.setDate(today.getDate() - 6)
   
-  // Format dates to YYYY-MM-DD
+
   const startDate = sevenDaysAgo.toISOString().split('T')[0]
   const endDate = today.toISOString().split('T')[0]
   
-  console.log('Fetching orders from', startDate, 'to', endDate)
+  // console.log('Fetching orders from', startDate, 'to', endDate)
   
-  // Get all orders within the last 7 days
+
   const { data, error } = await supabase
     .from('orders')
     .select('order_date')
@@ -143,14 +137,13 @@ async function getWeeklyOrdersData() {
     .lte('order_date', endDate)
 
   if (error) {
-    console.error('Error fetching orders data:', error)
     console.error('Error details:', error.message, error.details, error.hint)
     return []
   }
 
-  console.log('Raw orders data:', data)
+  // console.log(data)
 
-  // Count orders for each date
+  // Count orders
   const dateCounts: { [key: string]: number } = {}
   
   data?.forEach(order => {
@@ -160,7 +153,7 @@ async function getWeeklyOrdersData() {
     }
   })
 
-  // Generate array for last 7 days with counts (including days with 0 orders)
+  
   const transformedData = []
   for (let i = 0; i < 7; i++) {
     const date = new Date(sevenDaysAgo)
@@ -173,54 +166,53 @@ async function getWeeklyOrdersData() {
     })
   }
 
-  console.log('Transformed weekly orders data:', transformedData)
+  // console.log(transformedData)
   return transformedData
 }
 
 async function getCustomerLocationData() {
   const supabase = await createClient()
   
-  console.log('Fetching customer location data...')
+  // console.log('Fetching customer location data...')
   
-  // Get all customers with their delivery addresses
+
   const { data, error } = await supabase
     .from('customers')
     .select('delivery_address')
 
   if (error) {
-    console.error('Error fetching customer location data:', error)
     console.error('Error details:', error.message, error.details, error.hint)
     return []
   }
 
-  console.log('Raw customer location data:', data)
+  // console.log(data)
 
-  // Extract last word from each address and count occurrences
+
   const locationCounts: { [key: string]: number } = {}
   
   data?.forEach(customer => {
     const address = customer.delivery_address
     if (address) {
-      // Split address by spaces and get the last word
+      // get last word
       const words = address.trim().split(/\s+/)
       const lastWord = words[words.length - 1]?.toLowerCase()
       
       if (lastWord && lastWord.length > 0) {
-        // Capitalize first letter for display
         const location = lastWord.charAt(0).toUpperCase() + lastWord.slice(1)
         locationCounts[location] = (locationCounts[location] || 0) + 1
       }
+      
     }
   })
 
   const transformedData = Object.entries(locationCounts)
-    .map(([location, count], index) => ({
+    .map(([location, count]) => ({
       location,
       customers: count,
     }))
-    .sort((a, b) => b.customers - a.customers) // Sort by count descending
+    .sort((a, b) => b.customers - a.customers)
 
-  console.log('Transformed location data:', transformedData)
+  // console.log(transformedData)
   return transformedData
 }
 

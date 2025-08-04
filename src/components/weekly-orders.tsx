@@ -77,10 +77,10 @@ export function WeeklyOrdersChart({ chartData }: WeeklyOrdersChartProps) {
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
         <div className="flex gap-2 leading-none font-medium">
-          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
+          More orders than usual <TrendingUp className="h-4 w-4" />
         </div>
         <div className="text-muted-foreground leading-none">
-          Showing total orders by date from database
+          Showing total orders by date
         </div>
       </CardFooter>
     </Card>

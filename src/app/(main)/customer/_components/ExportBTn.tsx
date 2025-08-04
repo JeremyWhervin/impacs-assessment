@@ -13,12 +13,12 @@ export function ExportPDFButton({ customerName }: ExportPDFButtonProps) {
     try {
       const pdf = new jsPDF('p', 'mm', 'a4')
       const pageWidth = pdf.internal.pageSize.getWidth()
-      const pageHeight = pdf.internal.pageSize.getHeight()
+      // const pageHeight = pdf.internal.pageSize.getHeight()
       const margin = 20
       const contentWidth = pageWidth - margin * 2
       let yPos = margin
 
-      // Title
+      
       const title = `Customer Details - ${customerName}`
       pdf.setFontSize(18)
       pdf.setFont('helvetica', 'bold')
@@ -53,7 +53,7 @@ export function ExportPDFButton({ customerName }: ExportPDFButtonProps) {
                 processNode(child)
               }
               if (tag === 'p' || tag === 'div') {
-                lines.push({ text: '', style: 'normal' }) // blank line for paragraph spacing
+                lines.push({ text: '', style: 'normal' })
               }
             }
           }
@@ -66,11 +66,7 @@ export function ExportPDFButton({ customerName }: ExportPDFButtonProps) {
       const contentLines = extractTextContent(element)
 
       for (const line of contentLines) {
-        // Page break if near bottom
-        if (yPos > pageHeight - margin) {
-          pdf.addPage()
-          yPos = margin
-        }
+
 
         if (line.style === 'heading') {
           pdf.setFont('helvetica', 'bold')
@@ -87,7 +83,7 @@ export function ExportPDFButton({ customerName }: ExportPDFButtonProps) {
           pdf.setFont('helvetica', 'normal')
           pdf.setFontSize(12)
           if (line.text === '') {
-            yPos += 5 // line break for spacing
+            yPos += 5 
           } else {
             const wrapped = pdf.splitTextToSize(line.text, contentWidth)
             pdf.text(wrapped, margin, yPos)

@@ -5,7 +5,6 @@ import { Plus, CalendarIcon } from "lucide-react"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
 import { createClient } from "@/utils/supabase/client"
-
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -22,6 +21,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+
+
 
 interface CustomerFormData {
   name: string
@@ -68,14 +69,15 @@ export function CreateCustomerButton() {
         .single()
 
       if (customerError) {
-        console.error('Error creating customer:', customerError)
+        console.error('Error creating customer', customerError)
         alert('Failed to create customer')
+        // add sonner when ur done
         return
       }
 
-      console.log('Customer created successfully:', customer)
+      // console.log('Customer created successfully', customer)
 
-      // Create order if order date is provided
+      // Create order 
       if (formData.order_date && customer) {
         const orderDate = formData.order_date.toISOString().split('T')[0]
         const deliveryDate = formData.delivery_date?.toISOString().split('T')[0] || null
@@ -98,19 +100,19 @@ export function CreateCustomerButton() {
           .single()
 
         if (orderError) {
-          console.error('Error creating order:', orderError)
+          // console.error('Error creating order', orderError)
           console.error('Order error details:', {
             message: orderError.message,
             details: orderError.details,
             hint: orderError.hint
           })
-          alert(`Customer created but failed to create order: ${orderError.message}`)
+          alert('Customer created but failed to create order')
           return
         }
 
-        console.log('Order created successfully:', order)
+        // console.log('Order created successfully', order)
 
-        // Create ordered_toy if toy is selected
+        // Create ordered toy
         if (formData.toy_id && order) {
           console.log('Creating ordered toy with:', {
             order_id: order.id,
@@ -127,21 +129,22 @@ export function CreateCustomerButton() {
             })
 
           if (orderedToyError) {
-            console.error('Error creating ordered toy:', orderedToyError)
-            console.error('Toy error details:', {
+            // console.error('Error creating ordered toy', orderedToyError)
+            console.error('Toy error details', {
               message: orderedToyError.message,
               details: orderedToyError.details,
               hint: orderedToyError.hint
             })
-            alert(`Customer and order created but failed to add toy: ${orderedToyError.message}`)
+            alert(`Customer and order created but failed to add toy`)
             return
           }
 
-          console.log('Ordered toy created successfully')
+          // console.log('Ordered toy created successfully')
         }
       }
 
       alert('Customer created successfully!')
+      window.location.reload()
       setOpen(false)
       setFormData({
         name: '',
@@ -154,7 +157,6 @@ export function CreateCustomerButton() {
         quantity: 1
       })
 
-      window.location.reload()
     } catch (error) {
       console.error('Error:', error)
       alert('Failed to create customer')
@@ -173,13 +175,16 @@ export function CreateCustomerButton() {
       </PopoverTrigger>
       <PopoverContent className="w-[400px] max-h-[80vh] overflow-y-auto p-4 space-y-4">
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Section Heading */}
+          
+
+
           <div>
             <h4 className="font-medium text-base leading-none">Customer Info</h4>
             <p className="text-sm text-muted-foreground">Basic details about the customer</p>
           </div>
 
-          {/* Name */}
+          
+
           <div className="grid gap-2">
             <Label htmlFor="name">Name *</Label>
             <Input
@@ -190,7 +195,9 @@ export function CreateCustomerButton() {
             />
           </div>
 
-          {/* Email */}
+          
+          
+
           <div className="grid gap-2">
             <Label htmlFor="email">Email *</Label>
             <Input
@@ -202,7 +209,7 @@ export function CreateCustomerButton() {
             />
           </div>
 
-          {/* Phone */}
+          
           <div className="grid gap-2">
             <Label htmlFor="phone">Phone</Label>
             <Input
@@ -212,7 +219,7 @@ export function CreateCustomerButton() {
             />
           </div>
 
-          {/* Address */}
+          
           <div className="grid gap-2">
             <Label htmlFor="address">Delivery Address</Label>
             <Input
@@ -222,13 +229,14 @@ export function CreateCustomerButton() {
             />
           </div>
 
-          {/* Order Details Section */}
+          
           <div>
             <h4 className="font-medium text-base leading-none">Order Info (Optional)</h4>
             <p className="text-sm text-muted-foreground">Add order and toy if available</p>
           </div>
 
-          {/* Order Date */}
+          
+
           <div className="grid gap-2">
             <Label>Order Date</Label>
             <Popover>
@@ -255,7 +263,8 @@ export function CreateCustomerButton() {
             </Popover>
           </div>
 
-          {/* Delivery Date */}
+          
+
           <div className="grid gap-2">
             <Label>Delivery Date</Label>
             <Popover>
@@ -282,7 +291,8 @@ export function CreateCustomerButton() {
             </Popover>
           </div>
 
-          {/* Toy Select */}
+          
+
           <div className="grid gap-2">
             <Label htmlFor="toy">Toy</Label>
             <Select value={formData.toy_id} onValueChange={(value) => setFormData({ ...formData, toy_id: value })}>
@@ -290,6 +300,9 @@ export function CreateCustomerButton() {
                 <SelectValue placeholder="Select a toy" />
               </SelectTrigger>
               <SelectContent>
+
+
+                {/* just use the uuid */}
                 <SelectItem value="12fab815-5aad-4aa3-8aad-f54e7036442f">Truck</SelectItem>
                 <SelectItem value="3844adb8-c7c5-4e7c-aaa5-06909e0c0a89">LEGO set</SelectItem>
                 <SelectItem value="1c2f1674-2e16-4fcd-be33-19f1473e8ca0">Stuffed Animal</SelectItem>
@@ -299,7 +312,7 @@ export function CreateCustomerButton() {
             </Select>
           </div>
 
-          {/* Quantity */}
+          
           <div className="grid gap-2">
             <Label htmlFor="quantity">Quantity</Label>
             <Input
@@ -311,7 +324,7 @@ export function CreateCustomerButton() {
             />
           </div>
 
-          {/* Action Buttons */}
+          
           <div className="flex gap-2 pt-2">
             <Button type="submit" disabled={loading} className="flex-1">
               {loading ? "Creating..." : "Create"}

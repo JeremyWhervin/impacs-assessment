@@ -26,7 +26,7 @@ interface CustomerDetailPageProps {
 async function getCustomerData(customerId: string) {
   const supabase = await createClient()
   
-  // Get customer details
+  
   const { data: customer, error: customerError } = await supabase
     .from('customers')
     .select('*')
@@ -34,11 +34,12 @@ async function getCustomerData(customerId: string) {
     .single()
 
   if (customerError || !customer) {
-    console.error('Error fetching customer:', customerError)
+    console.error('Error fetching customer', customerError)
     return null
   }
 
-  // Get all orders for this customer
+  
+  
   const { data: orders, error: ordersError } = await supabase
     .from('orders')
     .select('*')
@@ -46,10 +47,11 @@ async function getCustomerData(customerId: string) {
     .order('order_date', { ascending: false })
 
   if (ordersError) {
-    console.error('Error fetching orders:', ordersError)
+    console.error('Error fetching orders', ordersError)
   }
 
-  // Get ordered toys for this customer
+  
+  
   const { data: orderedToys, error: toysError } = await supabase
     .from('ordered_toys')
     .select(`
@@ -61,7 +63,7 @@ async function getCustomerData(customerId: string) {
     .in('order_id', orders?.map(order => order.id) || [])
 
   if (toysError) {
-    console.error('Error fetching ordered toys:', toysError)
+    console.error('Error fetching ordered toys', toysError)
   }
 
   return {
@@ -80,7 +82,8 @@ export default async function CustomerDetailPage({ params }: CustomerDetailPageP
 
   const { customer, orders, orderedToys } = data
 
-  // Count unique toys
+  
+  
   const uniqueToys = new Set(orderedToys.map(toy => (toy.toys as any)?.name)).size
 
   return (
@@ -91,7 +94,9 @@ export default async function CustomerDetailPage({ params }: CustomerDetailPageP
       </div>
       <div className='p-4 space-y-3 whereToGet'>
         
-        {/* Customer Information Card */}
+        
+        
+
         <Card>
           <CardHeader>
             <CardTitle>Customer Information</CardTitle>
@@ -119,7 +124,9 @@ export default async function CustomerDetailPage({ params }: CustomerDetailPageP
           </CardContent>
         </Card>
 
-        {/* Statistics Cards */}
+        
+        
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <Card>
             <CardHeader className="pb-2">
@@ -151,7 +158,9 @@ export default async function CustomerDetailPage({ params }: CustomerDetailPageP
           </Card>
         </div>
 
-        {/* Order History */}
+        
+        
+
         <Card>
           <CardHeader>
             <CardTitle>Order History</CardTitle>
@@ -194,7 +203,11 @@ export default async function CustomerDetailPage({ params }: CustomerDetailPageP
           </CardContent>
         </Card>
 
-        {/* Toy Preferences */}
+        
+        
+
+
+
         <Card>
           <CardHeader>
             <CardTitle>Toy Preferences</CardTitle>
