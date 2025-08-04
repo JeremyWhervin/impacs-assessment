@@ -84,7 +84,7 @@ export default async function CustomerDetailPage({ params }: CustomerDetailPageP
 
   
   
-  const uniqueToys = new Set(orderedToys.map(toy => (toy.toys as any)?.name)).size
+  const uniqueToys = new Set(orderedToys.map(toy => (toy.toys as { name: string }[])[0]?.name)).size
 
   return (
     <div className="w-full">
@@ -215,7 +215,7 @@ export default async function CustomerDetailPage({ params }: CustomerDetailPageP
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2">
-              {Array.from(new Set(orderedToys.map(toy => (toy.toys as any)?.name))).map((toyName, index) => (
+              {Array.from(new Set(orderedToys.map(toy => (toy.toys as { name: string }[])[0]?.name))).map((toyName, index) => (
                 <span 
                   key={index}
                   className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"

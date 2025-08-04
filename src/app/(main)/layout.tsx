@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react'
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import { SidebarProvider } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
 
 const MainLayout = ({ children }:{ children:React.ReactNode }) => {

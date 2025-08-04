@@ -4,6 +4,7 @@ import KPIrow from './_components/KPIrow'
 import SecondRow from './_components/SecondRow'
 import ThirdRow from './_components/ThirdRow'
 
+
 async function getOrderCount() {
   const supabase = await createClient()
   
@@ -91,7 +92,7 @@ async function getToyPopularityData() {
     `)
 
   if (error) {
-    console.error('Error details:', error.message, error.details, error.hint)
+    console.error('Error details', error.message, error.details, error.hint)
     return []
   }
 
@@ -101,7 +102,7 @@ async function getToyPopularityData() {
   const toyCounts: { [key: string]: number } = {}
   
   data?.forEach(item => {
-    const toyName = (item.toys as any)?.name || 'Unknown Toy'
+    const toyName = (item.toys as { name: string }[])[0]?.name || 'Unknown Toy'
     toyCounts[toyName] = (toyCounts[toyName] || 0) + 1
   })
 
@@ -110,7 +111,7 @@ async function getToyPopularityData() {
     orders
   }))
 
-  console.log('Transformed data:', transformedData)
+  console.log('Transformed data', transformedData)
   return transformedData
 }
 

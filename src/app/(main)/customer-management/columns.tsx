@@ -26,9 +26,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-
-
-
 export type CustomersTable = {
   customerName: string
   email: string
@@ -74,9 +71,8 @@ function EditCustomerDialog({ customer }: EditCustomerDialogProps) {
       }
 
       alert('Customer updated successfully!')
+      window.location.reload()
       setOpen(false)
-      
-
     } catch (error) {
       console.error('Error:', error)
       alert('Failed to update customer')
@@ -96,7 +92,7 @@ function EditCustomerDialog({ customer }: EditCustomerDialogProps) {
         <DialogHeader>
           <DialogTitle>Edit Customer Details</DialogTitle>
           <DialogDescription>
-            Make changes to the customer information here. Click save when you're done.
+            Make changes to the customer information here.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
@@ -160,152 +156,101 @@ function EditCustomerDialog({ customer }: EditCustomerDialogProps) {
   )
 }
 
+interface EditableCellProps {
+  value: string
+  customerId: string
+  column: "customerName" | "email"
+}
+
+function EditableCell({ value, customerId, column }: EditableCellProps) {
+  const [isEditing, setIsEditing] = useState(false)
+  const [currentValue, setCurrentValue] = useState(value)
+  const [originalValue] = useState(value)
+
+  const handleSave = async () => {
+    try {
+      const supabase = createClient()
+      const { error } = await supabase
+        .from('customers')
+        .update({ [column === "customerName" ? "name" : "email"]: currentValue })
+        .eq('id', customerId)
+
+      if (error) {
+        console.error('Error updating customer:', error)
+        alert(`Failed to update customer ${column}`)
+        setCurrentValue(originalValue)
+        return
+      }
+
+      setIsEditing(false)
+    } catch (error) {
+      console.error('Error:', error)
+      alert(`Failed to update customer ${column}`)
+      setCurrentValue(originalValue)
+    }
+  }
+
+  const handleCancel = () => {
+    setCurrentValue(originalValue)
+    setIsEditing(false)
+  }
+
+  if (isEditing) {
+    return (
+      <div className="flex items-center gap-2">
+        <Input
+          value={currentValue}
+          onChange={(e) => setCurrentValue(e.target.value)}
+          className="h-8 w-full max-w-[180px]"
+          autoFocus
+        />
+        <Button size="sm" variant="ghost" onClick={handleSave} className="h-6 w-6 p-0">
+          <Check className="h-3 w-3" />
+        </Button>
+        <Button size="sm" variant="ghost" onClick={handleCancel} className="h-6 w-6 p-0">
+          <X className="h-3 w-3" />
+        </Button>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex items-center gap-2 group">
+      <span>{currentValue}</span>
+      <Button 
+        size="sm" 
+        variant="ghost" 
+        onClick={() => setIsEditing(true)} 
+        className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+      >
+        <Edit className="h-3 w-3" />
+      </Button>
+    </div>
+  )
+}
+
 export const columns: ColumnDef<CustomersTable>[] = [
   {
     accessorKey: "customerName",
     header: "Name",
-    cell: ({ row }) => {
-      const [isEditing, setIsEditing] = useState(false)
-      const [value, setValue] = useState(row.getValue("customerName") as string)
-      const [originalValue] = useState(row.getValue("customerName") as string)
-      const customerId = row.original.customerId
-
-      const handleSave = async () => {
-        try {
-          const supabase = createClient()
-          const { error } = await supabase
-            .from('customers')
-            .update({ name: value })
-            .eq('id', customerId)
-
-          if (error) {
-            console.error('Error updating customer:', error)
-            alert('Failed to update customer name')
-            setValue(originalValue)
-            return
-          }
-
-          setIsEditing(false)
-          
-          row.original.customerName = value
-        } catch (error) {
-          console.error('Error:', error)
-          alert('Failed to update customer name')
-          setValue(originalValue)
-        }
-      }
-
-      const handleCancel = () => {
-        setValue(originalValue)
-        setIsEditing(false)
-      }
-
-      if (isEditing) {
-        return (
-          <div className="flex items-center gap-2">
-            <Input
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              className="h-8 w-32"
-              autoFocus
-            />
-            <Button size="sm" variant="ghost" onClick={handleSave} className="h-6 w-6 p-0">
-              <Check className="h-3 w-3" />
-            </Button>
-            <Button size="sm" variant="ghost" onClick={handleCancel} className="h-6 w-6 p-0">
-              <X className="h-3 w-3" />
-            </Button>
-          </div>
-        )
-      }
-
-      return (
-        <div className="flex items-center gap-2">
-          <span>{value}</span>
-          <Button 
-            size="sm" 
-            variant="ghost" 
-            onClick={() => setIsEditing(true)} 
-            className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-          >
-            <Edit className="h-3 w-3" />
-          </Button>
-        </div>
-      )
-    },
+    cell: ({ row }) => (
+      <EditableCell 
+        value={row.getValue("customerName")} 
+        customerId={row.original.customerId}
+        column="customerName"
+      />
+    ),
   },
   {
     accessorKey: "email",
     header: "Email",
-    cell: ({ row }) => {
-      const [isEditing, setIsEditing] = useState(false)
-      const [value, setValue] = useState(row.getValue("email") as string)
-      const [originalValue] = useState(row.getValue("email") as string)
-      const customerId = row.original.customerId
-
-      const handleSave = async () => {
-        try {
-          const supabase = createClient()
-          const { error } = await supabase
-            .from('customers')
-            .update({ email: value })
-            .eq('id', customerId)
-
-          if (error) {
-            console.error('Error updating customer:', error)
-            alert('Failed to update customer email')
-            setValue(originalValue)
-            return
-          }
-
-          setIsEditing(false)
-          
-          row.original.email = value
-        } catch (error) {
-          console.error('Error:', error)
-          alert('Failed to update customer email')
-          setValue(originalValue)
-        }
-      }
-
-      const handleCancel = () => {
-        setValue(originalValue)
-        setIsEditing(false)
-      }
-
-      if (isEditing) {
-        return (
-          <div className="flex items-center gap-2">
-            <Input
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              className="h-8 w-40"
-              autoFocus
-            />
-            <Button size="sm" variant="ghost" onClick={handleSave} className="h-6 w-6 p-0">
-              <Check className="h-3 w-3" />
-            </Button>
-            <Button size="sm" variant="ghost" onClick={handleCancel} className="h-6 w-6 p-0">
-              <X className="h-3 w-3" />
-            </Button>
-          </div>
-        )
-      }
-
-      return (
-        <div className="flex items-center gap-2">
-          <span>{value}</span>
-          <Button 
-            size="sm" 
-            variant="ghost" 
-            onClick={() => setIsEditing(true)} 
-            className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-          >
-            <Edit className="h-3 w-3" />
-          </Button>
-        </div>
-      )
-    },
+    cell: ({ row }) => (
+      <EditableCell 
+        value={row.getValue("email")} 
+        customerId={row.original.customerId}
+        column="email"
+      />
+    ),
   },
   {
     accessorKey: "recentOrderDate",
@@ -328,7 +273,6 @@ export const columns: ColumnDef<CustomersTable>[] = [
         try {
           const supabase = createClient()
           
-          
           const { data: orders } = await supabase
             .from('orders')
             .select('id')
@@ -336,7 +280,6 @@ export const columns: ColumnDef<CustomersTable>[] = [
 
           if (orders && orders.length > 0) {
             const orderIds = orders.map(order => order.id)
-            
             
             const { error: toyError } = await supabase
               .from('ordered_toys')
@@ -347,7 +290,6 @@ export const columns: ColumnDef<CustomersTable>[] = [
               console.error('Error deleting ordered toys:', toyError)
             }
 
-            
             const { error: orderError } = await supabase
               .from('orders')
               .delete()
@@ -358,24 +300,21 @@ export const columns: ColumnDef<CustomersTable>[] = [
             }
           }
 
-          
           const { error: customerError } = await supabase
             .from('customers')
             .delete()
             .eq('id', customer.customerId)
 
           if (customerError) {
-            // console.error('Error deleting customer', customerError)
             alert('Failed to delete customer')
-            // add sonner when ur done
             return
           }
 
           alert('Customer deleted successfully!')
           window.location.reload()
         } catch (error) {
-          // console.error('Error', error)
           alert('Failed to delete customer')
+          console.log(error)
         }
       }
  
