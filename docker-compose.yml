@@ -13,5 +13,6 @@ services:
     # Set up a volume to sync your local code changes to the container (for development)
     volumes:
       - .:/app
-    # Override the default command to use 'npm run dev' for live reloading
     command: npm run dev
+    environment:
+      - NODE_ENV=development

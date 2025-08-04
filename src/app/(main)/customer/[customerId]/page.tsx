@@ -17,16 +17,9 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-interface CustomerDetailPageProps {
-  params: {
-    customerId: string
-  }
-}
-
 async function getCustomerData(customerId: string) {
   const supabase = await createClient()
-  
-  
+
   const { data: customer, error: customerError } = await supabase
     .from('customers')
     .select('*')
@@ -38,8 +31,6 @@ async function getCustomerData(customerId: string) {
     return null
   }
 
-  
-  
   const { data: orders, error: ordersError } = await supabase
     .from('orders')
     .select('*')
@@ -50,8 +41,6 @@ async function getCustomerData(customerId: string) {
     console.error('Error fetching orders', ordersError)
   }
 
-  
-  
   const { data: orderedToys, error: toysError } = await supabase
     .from('ordered_toys')
     .select(`
@@ -73,8 +62,12 @@ async function getCustomerData(customerId: string) {
   }
 }
 
-export default async function CustomerDetailPage({ params }: CustomerDetailPageProps) {
-  const data = await getCustomerData(params.customerId)
+// Use unknown and assert the structure to avoid ESLint + build errors
+export default async function CustomerDetailPage(props: unknown) {
+  const { params } = props as { params: { customerId: string } }
+  const customerId = params.customerId
+
+  const data = await getCustomerData(customerId)
 
   if (!data) {
     notFound()
@@ -82,9 +75,9 @@ export default async function CustomerDetailPage({ params }: CustomerDetailPageP
 
   const { customer, orders, orderedToys } = data
 
-  
-  
-  const uniqueToys = new Set(orderedToys.map(toy => (toy.toys as { name: string }[])[0]?.name)).size
+  const uniqueToys = new Set(
+    orderedToys.map(toy => (toy.toys as { name: string }[])[0]?.name)
+  ).size
 
   return (
     <div className="w-full">
@@ -93,9 +86,6 @@ export default async function CustomerDetailPage({ params }: CustomerDetailPageP
         <ExportPDFButton customerName={customer.name} />
       </div>
       <div className='p-4 space-y-3 whereToGet'>
-        
-        
-        
 
         <Card>
           <CardHeader>
@@ -124,9 +114,6 @@ export default async function CustomerDetailPage({ params }: CustomerDetailPageP
           </CardContent>
         </Card>
 
-        
-        
-
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <Card>
             <CardHeader className="pb-2">
@@ -136,7 +123,7 @@ export default async function CustomerDetailPage({ params }: CustomerDetailPageP
               <div className="text-2xl font-bold">{orders.length}</div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium">Unique Toys</CardTitle>
@@ -145,7 +132,7 @@ export default async function CustomerDetailPage({ params }: CustomerDetailPageP
               <div className="text-2xl font-bold">{uniqueToys}</div>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium">Orders in Transit</CardTitle>
@@ -157,9 +144,6 @@ export default async function CustomerDetailPage({ params }: CustomerDetailPageP
             </CardContent>
           </Card>
         </div>
-
-        
-        
 
         <Card>
           <CardHeader>
@@ -181,15 +165,14 @@ export default async function CustomerDetailPage({ params }: CustomerDetailPageP
                   <TableRow key={order.id}>
                     <TableCell>{new Date(order.order_date).toLocaleDateString()}</TableCell>
                     <TableCell>
-                      {order.delivery_date 
+                      {order.delivery_date
                         ? new Date(order.delivery_date).toLocaleDateString()
-                        : 'Pending'
-                      }
+                        : 'Pending'}
                     </TableCell>
                     <TableCell>
                       <span className={`px-2 py-1 rounded-full text-xs ${
-                        order.delivery_date 
-                          ? 'bg-green-100 text-green-800' 
+                        order.delivery_date
+                          ? 'bg-green-100 text-green-800'
                           : 'bg-yellow-100 text-yellow-800'
                       }`}>
                         {order.delivery_date ? 'Delivered' : 'In Transit'}
@@ -203,11 +186,6 @@ export default async function CustomerDetailPage({ params }: CustomerDetailPageP
           </CardContent>
         </Card>
 
-        
-        
-
-
-
         <Card>
           <CardHeader>
             <CardTitle>Toy Preferences</CardTitle>
@@ -215,8 +193,10 @@ export default async function CustomerDetailPage({ params }: CustomerDetailPageP
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2">
-              {Array.from(new Set(orderedToys.map(toy => (toy.toys as { name: string }[])[0]?.name))).map((toyName, index) => (
-                <span 
+              {Array.from(new Set(
+                orderedToys.map(toy => (toy.toys as { name: string }[])[0]?.name)
+              )).map((toyName, index) => (
+                <span
                   key={index}
                   className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
                 >
@@ -229,4 +209,4 @@ export default async function CustomerDetailPage({ params }: CustomerDetailPageP
       </div>
     </div>
   )
-} 
+}

@@ -1,4 +1,6 @@
-FROM node:18-alpine AS builder
+FROM node:18 AS builder
+
+# FROM node:18 AS runner
 
 # Set the working directory
 WORKDIR /app
