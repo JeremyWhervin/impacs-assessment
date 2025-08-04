@@ -2,15 +2,11 @@ version: '3.8'
 
 services:
   nextjs-app:
-    # Build the image from the Dockerfile in the current directory
     build:
       context: .
-    # Map port 3000 from the container to port 3000 on the host machine
     ports:
       - "3000:3000"
-    # Set the working directory
     working_dir: /app
-    # Set up a volume to sync your local code changes to the container (for development)
     volumes:
       - .:/app
     command: npm run dev
