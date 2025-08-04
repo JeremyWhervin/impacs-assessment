@@ -1,8 +1,10 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  
+  experimental: {
+    // Setting turbo to false disables Turbopack, which in turn disables Lightning CSS
+    turbo: false, 
+  },
 };
 
 export default nextConfig;
