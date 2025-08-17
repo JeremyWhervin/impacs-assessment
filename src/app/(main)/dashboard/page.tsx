@@ -139,7 +139,7 @@ async function getToyPopularityData() {
 
   data?.forEach(item => {
     // Access the name property directly.
-    const toyName = item.toys?.name || 'Unknown Toy'
+    const toyName = item.toys?.[0]?.name || 'Unknown Toy'
     toyCounts.set(toyName, (toyCounts.get(toyName) || 0) + 1)
   })
 
