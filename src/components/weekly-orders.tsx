@@ -20,16 +20,6 @@ import {
 
 export const description = "A horizontal bar chart"
 
-// const defaultChartData = [
-//   { day: "day 1", orders: 186 },
-//   { day: "2025-07-29", orders: 305 },
-//   { day: "2025-07-30", orders: 237 },
-//   { day: "2025-07-31", orders: 73 },
-//   { day: "2025-08-01", orders: 209 },
-//   { day: "day 6", orders: 214 },
-//   { day: "day 7", orders: 214 },
-// ]
-
 const chartConfig = {
   orders: {
     label: "Orders",

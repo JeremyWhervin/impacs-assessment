@@ -51,96 +51,100 @@ async function getOrdersInTransitCount() {
   return count || 0
 }
 
-// async function getToyPopularityData() {
-//   const supabase = await createClient()
-  
-
-  
-
-//   const { data: orderedToysData, error: orderedToysError } = await supabase
-//     .from('ordered_toys')
-//     .select('*')
-//     .limit(5)
-
-//   if (orderedToysError) {
-//     console.error('ordered toys error', orderedToysError.message, orderedToysError.details, orderedToysError.hint)
-//     return []
-//   }
-
-//   console.log(orderedToysData)
-
-//   const { data: toysData, error: toysError } = await supabase
-//     .from('toys')
-//     .select('*')
-//     .limit(5)
-
-//   if (toysError) {
-//     console.error('toy error', toysError.message, toysError.details, toysError.hint)
-//     return []
-//   }
-
-//   console.log(toysData)
-
-
-//   const { data, error } = await supabase
-//     .from('ordered_toys')
-//     .select(`
-//       toy_id,
-//       toys (
-//         name
-//       )
-//     `)
-
-//   if (error) {
-//     console.error('Error details', error.message, error.details, error.hint)
-//     return []
-//   }
-
-//   // console.log(data)
-
-
-//   const toyCounts: { [key: string]: number } = {}
-  
-//   data?.forEach(item => {
-//     const toyName = (item.toys as { name: string }[])[0]?.name || 'Unknown Toy'
-//     toyCounts[toyName] = (toyCounts[toyName] || 0) + 1
-//   })
-
-//   const transformedData = Object.entries(toyCounts).map(([toy, orders]) => ({
-//     toy,
-//     orders
-//   }))
-
-//   console.log('Transformed data', transformedData)
-//   return transformedData
-// }
-
 
 async function getToyPopularityData() {
   const supabase = await createClient()
+  
+  // Use a Map for more efficient counting than a plain object.
+  const toyCounts = new Map()
 
-  // Select the toy_id and join with the toys table to get the name.
-  const { data, error } = await supabase
+  // Try first with the join approach
+  let { data, error } = await supabase
     .from('ordered_toys')
     .select(`
       toy_id,
-      toys (
+      toys!inner (
         name
       )
     `)
+
+  // If no data, try a different approach
+  if (!data || data.length === 0) {
+    console.log('Join approach failed, trying alternative...')
+    
+    // Get all ordered toys with their toy names
+    const { data: altData, error: altError } = await supabase
+      .from('ordered_toys')
+      .select('toy_id')
+    
+    if (altError) {
+      console.error('Alternative query error:', altError)
+      return []
+    }
+    
+    // Get toy names separately
+    const toyIds = altData?.map(item => item.toy_id).filter(Boolean) || []
+    if (toyIds.length > 0) {
+      const { data: toysData, error: toysError } = await supabase
+        .from('toys')
+        .select('id, name')
+        .in('id', toyIds)
+      
+      if (toysError) {
+        console.error('Toys query error:', toysError)
+        return []
+      }
+      
+      // Create a map of toy_id to toy_name
+      const toyNameMap = new Map()
+      toysData?.forEach(toy => {
+        toyNameMap.set(toy.id, toy.name)
+      })
+      
+      // Count toys
+      altData?.forEach(item => {
+        const toyName = toyNameMap.get(item.toy_id) || 'Unknown Toy'
+        toyCounts.set(toyName, (toyCounts.get(toyName) || 0) + 1)
+      })
+      
+      // Transform the Map into an array of objects.
+      const transformedData = Array.from(toyCounts.entries()).map(([toy, orders]) => ({
+        toy,
+        orders
+      }))
+      
+      console.log('Alternative approach transformed data:', transformedData)
+      return transformedData
+    }
+    
+    // If we get here, no data was found
+    console.log('No data found with either approach')
+    return []
+  }
 
   if (error) {
     console.error('Error details', error.message, error.details, error.hint)
     return []
   }
 
-  // Use a Map for more efficient counting than a plain object.
-  const toyCounts = new Map()
-
-  data?.forEach(item => {
-    // Access the name property directly.
-    const toyName = item.toys?.[0]?.name || 'Unknown Toy'
-    toyCounts.set(toyName, (toyCounts.get(toyName) || 0) + 1)
+  // Log the first few items to see the data structure
+  console.log('Raw data sample:', data?.slice(0, 3))
+  
+  data?.forEach((item: any) => {
+    // Handle different possible data structures
+    if (item.toys) {
+      if (Array.isArray(item.toys)) {
+        // If toys is an array
+        item.toys.forEach((toy: any) => {
+          const toyName = toy.name || 'Unknown Toy'
+          toyCounts.set(toyName, (toyCounts.get(toyName) || 0) + 1)
+        })
+      } else if (typeof item.toys === 'object' && item.toys.name) {
+        // If toys is a single object
+        const toyName = item.toys.name || 'Unknown Toy'
+        toyCounts.set(toyName, (toyCounts.get(toyName) || 0) + 1)
+      }
+    }
   })
 
   // Transform the Map into an array of objects.
@@ -152,6 +156,7 @@ async function getToyPopularityData() {
   console.log('Transformed data', transformedData)
   return transformedData
 }
+
 
 async function getWeeklyOrdersData() {
   const supabase = await createClient()

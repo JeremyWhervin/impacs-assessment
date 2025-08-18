@@ -186,7 +186,7 @@ export default async function CustomerDetailPage(props: unknown) {
           </CardContent>
         </Card>
 
-        <Card>
+        {/* <Card>
           <CardHeader>
             <CardTitle>Toy Preferences</CardTitle>
             <CardDescription>Toys ordered by this customer</CardDescription>
@@ -205,7 +205,7 @@ export default async function CustomerDetailPage(props: unknown) {
               ))}
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
     </div>
   )
