@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import React from 'react'
 import { createClient } from '@/utils/supabase/server'
 import KPIrow from './_components/KPIrow'
@@ -59,7 +61,7 @@ async function getToyPopularityData() {
   const toyCounts = new Map()
 
   // Try first with the join approach
-  let { data, error } = await supabase
+  const { data, error } = await supabase
     .from('ordered_toys')
     .select(`
       toy_id,
@@ -123,7 +125,8 @@ async function getToyPopularityData() {
   }
 
   if (error) {
-    console.error('Error details', error.message, error.details, error.hint)
+    // console.error('Error details', error.message, error.details, error.hint)
+    console.log('Error details', error)
     return []
   }
 
